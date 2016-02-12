@@ -1,4 +1,4 @@
-﻿# Mac
+# Mac
 /src/compiled/*.js
 /www/js/all.js
 /www/js/load.js
@@ -48,3 +48,8 @@ platforms/browser
 /info.txt
 bower_components
 updater/
+
+# app addons
+src/information/compiled
+www/css/information.css
+www/js/information_all.js

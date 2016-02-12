@@ -87,7 +87,7 @@ gulp.task 'cordova_prepare', ['copy_load_js', 'concat', 'clean', 'fetch_depends_
   cdv.prepare()
 
 gulp.task 'watch', ->
-  gulp.watch ['src/*.coffee', 'src/*.js', 'src/*.jsx', 'src/*.sass'], ['concat', 'sass']
+  gulp.watch ['src/*.coffee', 'src/*.js', 'src/*.jsx', 'src/*.sass', 'src/information/*.*'], ['concat', 'sass', 'compile_information']
 
 gulp.task 'default', ['cordova_prepare']
 
@@ -121,3 +121,30 @@ gulp.task 'updater', [], ->
   .pipe replace('__CSS__', 'https://calil.jp/static/apps/sabatomap/' + target + '/app.css?' + Math.random())
   .pipe uglify()
   .pipe gulp.dest 'updater/'
+
+# インフォメーション機能コンパイル
+gulp.task 'compile_information_sass', [], ->
+  postcss = require('gulp-postcss');
+  assets = require('postcss-assets');
+  gulp.src('src/information/information.sass')
+  .pipe(sass())
+  .pipe(postcss([
+    require('autoprefixer'),
+    assets({
+      loadPaths: ['www/img/']
+      relativeTo: 'www/css/'
+    })
+  ]))
+  .pipe(gulp.dest('www/css'))
+
+gulp.task 'compile_information_coffee', ->
+  gulp.src('src/information/information.coffee').pipe(coffee(bare: true)).pipe(gulp.dest('src/information/compiled'))
+
+gulp.task 'compile_information_jsx', ->
+  gulp.src('src/information/informationReact.jsx').pipe(react()).pipe(gulp.dest('src/information/compiled'))
+
+gulp.task 'clean_information_js', (cb)->
+  del(['www/js/information_all.js'], cb)
+
+gulp.task 'compile_information', ['clean_information_js', 'compile_information_coffee', 'compile_information_jsx', 'compile_information_sass'], ->
+  gulp.src('src/information/compiled/*.js').pipe(concat('information_all.js')).pipe(gulp.dest('www/js'))
