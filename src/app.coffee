@@ -11,7 +11,7 @@ http://opensource.org/licenses/mit-license.php
 # アプリケーション定数
 MAPBOX_TOKEN = 'pk.eyJ1IjoiY2FsaWxqcCIsImEiOiJxZmNyWmdFIn0.hgdNoXE7D6i7SrEo6niG0w'
 
-homeExtent = null
+boundingBox = null
 homeRotationRadian = 0
 waitingPosition = 0 # 現在地ボタンを待っているかどうか（1以上で待っている）
 UI = null
@@ -45,8 +45,7 @@ fitRotation = (r = homeRotationRadian)->
 fitFloor = ->
   # 現在地からの距離が200m以内の場合はアニメーションする
   c1 = ol.proj.transform(map.getView().getCenter(), map.getView().getProjection(), 'EPSG:4326')
-  c2 = ol.proj.transform([(homeExtent[0] + homeExtent[2]) / 2,
-    (homeExtent[1] + homeExtent[3]) / 2], 'EPSG:3857', 'EPSG:4326');
+  c2 = [(boundingBox[0] + boundingBox[2]) / 2, (boundingBox[1] + boundingBox[3]) / 2]
   distance = new ol.Sphere(6378137).haversineDistance(c1, c2)
   if distance <= 200
     fitRotation()
@@ -56,12 +55,11 @@ fitFloor = ->
     map.beforeRender(zoom)
   else
     map.getView().setRotation(homeRotationRadian)
-  map.getView().fit(homeExtent, map.getSize())
+  map.getView().fit(ol.proj.transformExtent(boundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # 施設を未選択にする
 unloadFacility = ->
   kanilayer.setFloorId null
-  homeExtent = null
   homeRotationRadian = 0
   kanimarker.setPosition null
   UI.setProps({systemid: null, floors: []})
@@ -71,12 +69,12 @@ unloadFacility = ->
 loadFacility = (id)->
   for f in kanikama.facilities_
     if f.id == id
-      homeExtent = f.extent
-      homeRotationRadian = f.rotation
+      boundingBox = f.entrance.bbox
+      homeRotationRadian = (180 - f.entrance.angle) * Math.PI / 180
       kanilayer.setTargetShelves []
       UI.setFacility f
       map.getView().setRotation(homeRotationRadian)
-      map.getView().fit(homeExtent, map.getSize())
+      map.getView().fit(ol.proj.transformExtent(boundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
       loadFloor f.floors[0].id
       return
 
@@ -220,7 +218,7 @@ navigateShelf = (floorId, shelves)->
       loadFloor(floorId)
   kanilayer.setTargetShelves(shelves)
   if shelves.length > 0
-    map.getView().fit(homeExtent, map.getSize())
+    map.getView().fit(ol.proj.transformExtent(boundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # マーカーとモード切り替えボタン
 invalidateLocator = ->
