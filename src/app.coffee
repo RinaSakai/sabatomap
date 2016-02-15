@@ -69,13 +69,15 @@ unloadFacility = ->
 loadFacility = (id)->
   for f in kanikama.facilities_
     if f.id == id
-      boundingBox = f.entrance.bbox
-      homeRotationRadian = (180 - f.entrance.angle) * Math.PI / 180
+      entrance = f.entrance
+      floor = f.floors.find((floor)-> floor.id is entrance)
+      boundingBox = floor.bbox
+      homeRotationRadian = (180 - floor.angle) * Math.PI / 180
       kanilayer.setTargetShelves []
       UI.setFacility f
       map.getView().setRotation(homeRotationRadian)
       map.getView().fit(ol.proj.transformExtent(boundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
-      loadFloor f.floors[0].id
+      loadFloor floor.id
       return
 
 # フロアを読み込む
