@@ -60,6 +60,7 @@ fitFloor = ->
 # 施設を未選択にする
 unloadFacility = ->
   kanilayer.setFloorId null
+  boundingBox = null
   homeRotationRadian = 0
   kanimarker.setPosition null
   UI.setProps({systemid: null, floors: []})
