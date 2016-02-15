@@ -11,7 +11,7 @@ http://opensource.org/licenses/mit-license.php
 # アプリケーション定数
 MAPBOX_TOKEN = 'pk.eyJ1IjoiY2FsaWxqcCIsImEiOiJxZmNyWmdFIn0.hgdNoXE7D6i7SrEo6niG0w'
 
-honeBoundingBox = null
+homeBoundingBox = null
 homeAngle = 0
 waitingPosition = 0 # 現在地ボタンを待っているかどうか（1以上で待っている）
 UI = null
@@ -21,7 +21,7 @@ kanilayer = new Kanilayer({targetImageUrl: 'img/flag.png', targetImageUrl2: 'img
 kanikama = new Kanikama()
 
 fitRotation = (r)->
-  if r == null
+  if typeof r is 'undefined'
     r = (180 - homeAngle) * Math.PI / 180
   oldAngle = (map.getView().getRotation() * 180 / Math.PI ) % 360
   if oldAngle < 0
@@ -47,7 +47,7 @@ fitRotation = (r)->
 fitFloor = ->
   # 現在地からの距離が200m以内の場合はアニメーションする
   c1 = ol.proj.transform(map.getView().getCenter(), map.getView().getProjection(), 'EPSG:4326')
-  c2 = [(honeBoundingBox[0] + honeBoundingBox[2]) / 2, (honeBoundingBox[1] + honeBoundingBox[3]) / 2]
+  c2 = [(homeBoundingBox[0] + homeBoundingBox[2]) / 2, (homeBoundingBox[1] + homeBoundingBox[3]) / 2]
   distance = new ol.Sphere(6378137).haversineDistance(c1, c2)
   if distance <= 200
     fitRotation()
@@ -57,12 +57,12 @@ fitFloor = ->
     map.beforeRender(zoom)
   else
     map.getView().setRotation((180 - homeAngle) * Math.PI / 180)
-  map.getView().fit(ol.proj.transformExtent(honeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
+  map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # 施設を未選択にする
 unloadFacility = ->
   kanilayer.setFloorId null
-  honeBoundingBox = null
+  homeBoundingBox = null
   homeAngle = 0
   kanimarker.setPosition null
   UI.setProps({systemid: null, floors: []})
@@ -73,12 +73,12 @@ loadFacility = (id)->
   facility = kanikama.facilities_.find((f)-> f.id is id)
   floor = facility.floors.find((f)-> f.id is facility.entrance)
 
-  honeBoundingBox = floor.bbox
+  homeBoundingBox = floor.bbox
   homeAngle = floor.angle
   kanilayer.setTargetShelves []
   UI.setFacility facility
   map.getView().setRotation((180 - homeAngle) * Math.PI / 180)
-  map.getView().fit(ol.proj.transformExtent(honeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
+  map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
   loadFloor floor.id
 
 # フロアを読み込む
@@ -221,7 +221,7 @@ navigateShelf = (floorId, shelves)->
       loadFloor(floorId)
   kanilayer.setTargetShelves(shelves)
   if shelves.length > 0
-    map.getView().fit(ol.proj.transformExtent(honeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
+    map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # マーカーとモード切り替えボタン
 invalidateLocator = ->
