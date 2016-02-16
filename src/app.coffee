@@ -10,17 +10,25 @@ http://opensource.org/licenses/mit-license.php
 
 # アプリケーション定数
 MAPBOX_TOKEN = 'pk.eyJ1IjoiY2FsaWxqcCIsImEiOiJxZmNyWmdFIn0.hgdNoXE7D6i7SrEo6niG0w'
+SABAE_TILE_EXTENT = ol.proj.transformExtent([
+  136.18617217725753,
+  35.961639755749225,
+  136.18697793129988,
+  35.96227957363341
+], 'EPSG:4326', 'EPSG:3857') # 鯖江市図書館エントランスフロアの範囲だけタイルを表示する(フロア同士の位置がズレる時は調整が必要)
 
-homeExtent = null
-homeRotationRadian = 0
+homeBoundingBox = null
+homeAngle = 0
 waitingPosition = 0 # 現在地ボタンを待っているかどうか（1以上で待っている）
 UI = null
 map = null
 kanimarker = null
-kanilayer = new Kanilayer({targetImageUrl: 'img/flag.png', targetImageUrl2: 'img/flag2.png'})
+kanilayer = new Kanilayer({targetImageUrl: 'img/flag.png', targetImageUrl2: 'img/flag2.png', extent: SABAE_TILE_EXTENT})
 kanikama = new Kanikama()
 
-fitRotation = (r = homeRotationRadian)->
+fitRotation = (r)->
+  if typeof r is 'undefined'
+    r = (180 - homeAngle) * Math.PI / 180
   oldAngle = (map.getView().getRotation() * 180 / Math.PI ) % 360
   if oldAngle < 0
     oldAngle += 360
@@ -45,8 +53,7 @@ fitRotation = (r = homeRotationRadian)->
 fitFloor = ->
   # 現在地からの距離が200m以内の場合はアニメーションする
   c1 = ol.proj.transform(map.getView().getCenter(), map.getView().getProjection(), 'EPSG:4326')
-  c2 = ol.proj.transform([(homeExtent[0] + homeExtent[2]) / 2,
-    (homeExtent[1] + homeExtent[3]) / 2], 'EPSG:3857', 'EPSG:4326');
+  c2 = [(homeBoundingBox[0] + homeBoundingBox[2]) / 2, (homeBoundingBox[1] + homeBoundingBox[3]) / 2]
   distance = new ol.Sphere(6378137).haversineDistance(c1, c2)
   if distance <= 200
     fitRotation()
@@ -55,35 +62,43 @@ fitFloor = ->
     zoom = ol.animation.zoom(easing: ol.easing.elastic, duration: 800, resolution: map.getView().getResolution())
     map.beforeRender(zoom)
   else
-    map.getView().setRotation(homeRotationRadian)
-  map.getView().fit(homeExtent, map.getSize())
+    map.getView().setRotation((180 - homeAngle) * Math.PI / 180)
+  map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # 施設を未選択にする
 unloadFacility = ->
   kanilayer.setFloorId null
-  homeExtent = null
-  homeRotationRadian = 0
+  homeBoundingBox = null
+  homeAngle = 0
   kanimarker.setPosition null
   UI.setProps({systemid: null, floors: []})
 
 # 施設を読み込む
 # @param id {String} 施設ID
 loadFacility = (id)->
-  for f in kanikama.facilities_
-    if f.id == id
-      homeExtent = f.extent
-      homeRotationRadian = f.rotation
-      kanilayer.setTargetShelves []
-      UI.setFacility f
-      map.getView().setRotation(homeRotationRadian)
-      map.getView().fit(homeExtent, map.getSize())
-      loadFloor f.floors[0].id
-      return
+  for facility in kanikama.facilities_
+    if facility.id == id
+      for floor in facility.floors
+        if floor.id is facility.entrance
+          homeBoundingBox = floor.bbox
+          homeAngle = floor.angle
+          kanilayer.setTargetShelves []
+          UI.setFacility facility
+          map.getView().setRotation((180 - homeAngle) * Math.PI / 180)
+          map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
+          loadFloor floor.id
+          return
 
 # フロアを読み込む
 # @param id {String} フロアID
 loadFloor = (id)->
   if kanilayer.floorId != id
+    for facility in kanikama.facilities_
+      for floor in facility.floors
+        if floor.id is id
+          homeBoundingBox = floor.bbox
+          homeAngle = floor.angle
+          break
     kanimarker.setPosition null
     kanilayer.setFloorId id
     UI.setFloorId id
@@ -220,7 +235,7 @@ navigateShelf = (floorId, shelves)->
       loadFloor(floorId)
   kanilayer.setTargetShelves(shelves)
   if shelves.length > 0
-    map.getView().fit(homeExtent, map.getSize())
+    map.getView().fit(ol.proj.transformExtent(homeBoundingBox, 'EPSG:4326', 'EPSG:3857'), map.getSize())
 
 # マーカーとモード切り替えボタン
 invalidateLocator = ->
