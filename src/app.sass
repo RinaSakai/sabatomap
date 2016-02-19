@@ -305,40 +305,70 @@ input[type=search]
     display: inline-block
     min-width: 60px
 
-#floors
+#floors_box
+  z-index: 1
   position: absolute
   bottom: 16px
   left: 14px
-  border-radius: 2px
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25)
-  > div
-    display: block
-    user-select: none
-    height: 45px
-    width: 45px
-    label
-      line-height: 48px
-      text-align: center
-      font-size: 18px
-      font-family: Helvetica, Arial, serif
+  > #floors
+    border-radius: 2px
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.25)
+    > div
       display: block
-      -webkit-user-select: none
+      user-select: none
       height: 45px
       width: 45px
-      background-color: #fff
-      transition: background-color 0.3s
-    &:first-child label
-      border-radius: 2px 2px 0 0
-    &:last-child label
-      border-radius: 0 0 2px 2px
-    &:only-child label
-      display: none !important
-    input
-      display: none
-      &:checked + label
+      label
+        position: absolute
+        line-height: 48px
+        text-align: center
+        font-size: 18px
+        font-family: Helvetica, Arial, serif
+        display: block
+        -webkit-user-select: none
+        height: 45px
+        width: 45px
+        background-color: #fff
+        transition: background-color 0.3s
+      &:first-child label
+        border-radius: 2px 2px 0 0
+      &:last-child label
+        border-radius: 0 0 2px 2px
+      &:only-child label
+        display: none !important
+      input
+        display: none
+        &:checked + label
+          background-color: rgba(56, 149, 255, 0.9) !important
+          font-weight: bold
+          color: #fff
+    transition: bottom 1s
+  > .infos
+    pointer-events: none
+    background-color: #fff
+    margin-left: -42px
+    opacity: 0
+    width: 0
+    > .title
+      font-size: 18px
+      font-weight: bold
+      border-bottom: solid 1px #000000
+    > div
+      height: 45px
+      line-height: 48px
+      padding-left: 12px
+      padding-right: 12px
+      &.active
         background-color: rgba(56, 149, 255, 0.9) !important
         font-weight: bold
         color: #fff
+  &.selected
+    > .infos
+      width: auto
+      margin-left: 0
+      opacity: 1
+  > div
+    float: left
 
 #compass
   height: 40px

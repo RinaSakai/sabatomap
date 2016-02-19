@@ -17,79 +17,16 @@
 <div id="compass" class="hidden"></div>
 <div id="ui"></div>
 
-<div id="nu-info"
-     style="
-      position: absolute;
-      top: 80px;
-      left: 100px;
-      z-index: 1;
-      overflow: auto;
-      height: 500px;
-      background-color: white;
-      "
-></div>
-
-<div id="floor_detail"
-     style="display: none; position: absolute; top: 80px; left: 200px; z-index: 1; overflow: auto; height: 520px; width: 255px; background-color: white;">
-  <button onclick="$('#floor_detail').toggle();" style="position:absolute; top:5px; right: 5px;">☓</button>
-  <button style="position:absolute; top:5px; right: 35px;"><i class="fa fa-refresh"></i></button>
-  <h3 style="margin: 2px;">鯖江市図書館1F</h3>
-  <div>
-    <i class="fa fa-wheelchair"></i>
-    <i class="fa fa-mars"></i>
-    <i class="fa fa-venus"></i>
-    <i class="fa fa-trash-o"></i>
-    <i class="fa fa-coffee"></i>
-    <i class="fa fa-phone"></i>
-    <i class="fa fa-bus"></i>
-    ...
-  </div>
-  <ul>
-    <li>このフロアの概要
-      <ul>
-        <li>参考図書</li>
-        <li>新聞・雑誌</li>
-        <li>カウンター</li>
-        <li>カフェ</li>
-      </ul>
-    </li>
-    <li>このフロアの人気本
-      <ul>
-        <li>◯◯3月号</li>
-        <li>◯◯新聞 今日の朝刊</li>
-        <li>鯖江市の歴史</li>
-      </ul>
-    </li>
-    <li>現在位置周辺の情報
-      <ul>
-        <li>本の貸出はカウンターで出来ます</li>
-      </ul>
-    </li>
-    <li>共有
-      <ul>
-        <li>Twitter</li>
-        <li>Facebook</li>
-        <li>Mail</li>
-        <li>LINE</li>
-      </ul>
-    </li>
-  </ul>
-</div>
-
 <div id="debug" style="position: absolute; top: 80px; left: 5px; z-index: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.65);">
-  <p style="font-weight: bold">デバッグ</p>
+  <div style="font-weight: bold">ボタンが横へ拡大</div>
+  <div style="font-size: 12px">※スライドして横幅が伸びてくると良さそう</div>
+  <div style="font-size: 12px">※ボタンを選択中は消えないようにする</div>
+  <br>
 
-  <p style="margin-bottom: 0;">図書館選択</p>
-  <button onClick="unloadFacility();">図書館を選ぶ</button><br>
-
-  <p style="margin-bottom: 0;">周辺の情報を探す</p>
-  <button onClick="loadNearestInformation(70);">ビーコン70</button><br>
-  <button onClick="loadNearestInformation(71);">ビーコン71</button><br>
-  <button onClick="loadNearestInformation(72);">ビーコン72</button><br>
-  <button onClick="testWaitNearestInformation();">ビーコンテスト</button><br>
-
-  <p style="margin-bottom: 0;">フロア詳細</p>
-  <button onClick="$('#floor_detail').toggle();">1F</button><br>
+  <div>デバッグパネル</div>
+  フロアボタンの状態を変更:
+  <button onclick="$('#floors_box').addClass('selected')">選択中</button>
+  <button onclick="$('#floors_box').removeClass('selected')">未選択</button>
 </div>
 
 <script src="cordova.js"></script>

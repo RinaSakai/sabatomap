@@ -242,11 +242,15 @@ var Facilities = React.createClass({
 var Floors = React.createClass({
     getInitialState: function () {
         return {
-            id: null
+            id: null,
+            selected: ''
         };
     },
     select: function (id) {
-        this.setState({id: id});
+        this.setState({selected: 'selected'});
+        setTimeout((function (){
+            this.setState({selected: ''});
+        }).bind(this), 1500);
         setTimeout(function () {
             loadFloor(id);
         }, 10);
@@ -255,19 +259,32 @@ var Floors = React.createClass({
         var floors;
         if (this.props.floors) {
             floors = this.props.floors.map(function (floor) {
+                var active = this.state.id === floor.id;
                 return (
                     <div className="floor">
-                        <input name="view" type="radio" id={'F'+floor.id} checked={this.state.id === floor.id}
+                        <input name="view" type="radio" id={'F'+floor.id} checked={active}
                                value={floor.id} onChange={this.select.bind(this,floor.id)}/>
                         <label htmlFor={'F'+floor.id}>{floor.label}</label>
                     </div>
                 );
             }, this);
             floors.reverse();
+            var infos = this.props.floors.map(function (floor) {
+                var active = this.state.id === floor.id;
+                return (
+                    <div className={active ? 'active' : ''}>{floor.info}</div>
+                );
+            }, this);
+            infos.reverse();
         }
         return (
-            <div id="floors">
-                {floors}
+            <div id="floors_box" className={this.state.selected}>
+                <div id="floors">
+                    {floors}
+                </div>
+                <div className="infos">
+                    {infos}
+                </div>
             </div>
         );
     }
