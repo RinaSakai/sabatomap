@@ -327,57 +327,56 @@ input[type=search] {
     min-width: 60px; }
 
 #floors {
-  z-index: 1;
   position: absolute;
   bottom: 16px;
   left: 14px;
   border-radius: 2px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none; }
-  #floors > div.floor {
-    display: block; }
-    #floors > div.floor label {
-      height: 45px;
-      width: 45px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25); }
+  #floors > div {
+    display: block;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none; }
+    #floors > div label {
       line-height: 48px;
       display: block;
+      height: 45px;
+      width: 45px;
       background-color: #fff;
       -webkit-transition: background-color 0.3s, width 1.0s;
       transition: background-color 0.3s, width 1.0s; }
-      #floors > div.floor label > p {
+      #floors > div label > p {
         position: absolute;
         pointer-events: none;
         margin: 0;
         height: 45px; }
-      #floors > div.floor label > p.name {
+      #floors > div label > p.name {
         left: 0;
         width: 45px;
         text-align: center;
         font-size: 18px;
         font-family: Helvetica, Arial, serif; }
-      #floors > div.floor label > p.info {
+      #floors > div label > p.info {
         left: 45px;
         width: auto;
         overflow: hidden;
         opacity: 0;
         -webkit-transition: opacity 0.8s;
         transition: opacity 0.8s; }
-      #floors > div.floor label.information {
+      #floors > div label.information {
         width: 200px; }
-        #floors > div.floor label.information > p.info {
+        #floors > div label.information > p.info {
           opacity: 1; }
-    #floors > div.floor:first-child label {
+    #floors > div:first-child label {
       border-radius: 2px 2px 0 0; }
-    #floors > div.floor:last-child label {
+    #floors > div:last-child label {
       border-radius: 0 0 2px 2px; }
-    #floors > div.floor:only-child label {
+    #floors > div:only-child label {
       display: none !important; }
-    #floors > div.floor input {
+    #floors > div input {
       display: none; }
-      #floors > div.floor input:checked + label {
+      #floors > div input:checked + label {
         background-color: rgba(56, 149, 255, 0.9) !important;
         font-weight: bold;
         color: #fff; }

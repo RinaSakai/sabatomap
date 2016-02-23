@@ -256,6 +256,7 @@ var Floors = React.createClass({
         this.setState({mode: mode});
     },
     select: function (id) {
+        this.setState({id: id});
         if (this.state.lastSelect != null && (new Date() - this.state.lastSelect) < 2000) {
             this.changeMode('information');
 
@@ -292,10 +293,13 @@ var Floors = React.createClass({
             floors.reverse();
         }
         return (
-            <div id="floors">{floors}</div>
+            <div id="floors">
+                {floors}
+            </div>
         );
     }
 });
+
 
 var Locator = React.createClass({
     lastAppear: null,
