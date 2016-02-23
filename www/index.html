@@ -18,15 +18,18 @@
 <div id="ui"></div>
 
 <div id="debug" style="position: absolute; top: 80px; left: 5px; z-index: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.65);">
-  <div style="font-weight: bold">ボタンが横へ拡大</div>
-  <div style="font-size: 12px">※スライドして横幅が伸びてくると良さそう</div>
-  <div style="font-size: 12px">※ボタンを選択中は消えないようにする</div>
+  <div style="font-weight: bold">データの確認</div>
   <br>
 
   <div>デバッグパネル</div>
-  フロアボタンの状態を変更:
-  <button onclick="$('#floors_box').addClass('selected')">選択中</button>
-  <button onclick="$('#floors_box').removeClass('selected')">未選択</button>
+  <br>
+  図書館の変更:
+  <button onClick="unloadFacility();loadFacility('7');">鯖江</button>
+  <button onClick="unloadFacility();loadFacility('3');">名大</button>
+  <br>
+  <br>
+  表示切り替え:
+  <button onClick="UI.refs.floors.changeMode('information');">表示</button>
 </div>
 
 <script src="cordova.js"></script>

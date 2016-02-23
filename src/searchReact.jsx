@@ -243,14 +243,29 @@ var Floors = React.createClass({
     getInitialState: function () {
         return {
             id: null,
-            selected: ''
+            mode: 'normal',
+            modeTimer: null,
+            lastSelect: null
         };
     },
+    changeMode: function (mode) {
+        if (this.state.modeTimer != null) {
+            clearTimeout(this.state.modeTimer);
+            this.state.modeTimer = null;
+        }
+        this.setState({mode: mode});
+    },
     select: function (id) {
-        this.setState({selected: 'selected'});
-        setTimeout((function (){
-            this.setState({selected: ''});
-        }).bind(this), 1500);
+        if (this.state.lastSelect != null && (new Date() - this.state.lastSelect) < 2000) {
+            this.changeMode('information');
+
+            // クリック4秒後に元の表示に戻す
+            this.state.modeTimer = setTimeout(function () {
+                this.changeMode('normal');
+            }.bind(this), 4000);
+        }
+        this.state.lastSelect = new Date();
+
         setTimeout(function () {
             loadFloor(id);
         }, 10);
@@ -259,37 +274,28 @@ var Floors = React.createClass({
         var floors;
         if (this.props.floors) {
             floors = this.props.floors.map(function (floor) {
-                var active = this.state.id === floor.id;
                 return (
                     <div className="floor">
-                        <input name="view" type="radio" id={'F'+floor.id} checked={active}
-                               value={floor.id} onChange={this.select.bind(this,floor.id)}/>
-                        <label htmlFor={'F'+floor.id}>{floor.label}</label>
+                        <input name="view"
+                               type="radio"
+                               id={'F'+floor.id}
+                               value={floor.id}
+                               checked={this.state.id === floor.id}
+                               onChange={this.select.bind(this, floor.id)}/>
+                        <label className={this.state.mode} htmlFor={'F'+floor.id}>
+                            <p className="name">{floor.label}</p>
+                            <p className="info">{floor.info}</p>
+                        </label>
                     </div>
                 );
             }, this);
             floors.reverse();
-            var infos = this.props.floors.map(function (floor) {
-                var active = this.state.id === floor.id;
-                return (
-                    <div className={active ? 'active' : ''}>{floor.info}</div>
-                );
-            }, this);
-            infos.reverse();
         }
         return (
-            <div id="floors_box" className={this.state.selected}>
-                <div id="floors">
-                    {floors}
-                </div>
-                <div className="infos">
-                    {infos}
-                </div>
-            </div>
+            <div id="floors">{floors}</div>
         );
     }
 });
-
 
 var Locator = React.createClass({
     lastAppear: null,
@@ -395,3 +401,12 @@ var InitUI = function (props, element) {
         element
     )
 };
+
+// debug code
+$(document).on('click', function (ev) {
+    if ($('#debug').find(ev.target).length === 0) {
+        if ($('#floors').find(ev.target).length === 0) {
+            UI.refs.floors.changeMode('normal');
+        }
+    }
+});
