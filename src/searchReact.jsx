@@ -249,23 +249,23 @@ var Floors = React.createClass({
         };
     },
     changeMode: function (mode) {
-        if (this.state.modeTimer != null) {
-            clearTimeout(this.state.modeTimer);
-            this.state.modeTimer = null;
-        }
         this.setState({mode: mode});
     },
     select: function (id) {
-        this.setState({id: id});
+        React.findDOMNode(this).focus(); // for ios webview
         if (this.state.lastSelect != null && (new Date() - this.state.lastSelect) < 2000) {
             this.changeMode('information');
 
-            // クリック4秒後に元の表示に戻す
-            this.state.modeTimer = setTimeout(function () {
+            if (this.state.modeTimer != null) {
+                clearTimeout(this.state.modeTimer);
+                this.setState({modeTimer: null});
+            }
+            var timer = setTimeout(function () {
                 this.changeMode('normal');
             }.bind(this), 4000);
+            this.setState({modeTimer: timer});
         }
-        this.state.lastSelect = new Date();
+        this.setState({id: id, lastSelect: new Date()});
 
         setTimeout(function () {
             loadFloor(id);
@@ -283,7 +283,7 @@ var Floors = React.createClass({
                                value={floor.id}
                                checked={this.state.id === floor.id}
                                onChange={this.select.bind(this, floor.id)}/>
-                        <label className={this.state.mode} htmlFor={'F'+floor.id}>
+                        <label htmlFor={'F'+floor.id}>
                             <p className="name">{floor.label}</p>
                             <p className="info">{floor.info}</p>
                         </label>
@@ -293,7 +293,7 @@ var Floors = React.createClass({
             floors.reverse();
         }
         return (
-            <div id="floors">
+            <div id="floors" className={this.state.mode} tabIndex="0">
                 {floors}
             </div>
         );
@@ -405,12 +405,3 @@ var InitUI = function (props, element) {
         element
     )
 };
-
-// debug code
-$(document).on('click', function (ev) {
-    if ($('#debug').find(ev.target).length === 0) {
-        if ($('#floors').find(ev.target).length === 0) {
-            UI.refs.floors.changeMode('normal');
-        }
-    }
-});
